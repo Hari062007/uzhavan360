@@ -1,0 +1,49 @@
+name: Build UZHAVAN360 Android APK
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch: # Allows manual trigger with a single click in GitHub
+
+jobs:
+  build:
+    name: Build Android APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Java 17 (Temurin)
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.7'
+          channel: 'stable'
+          cache: true
+
+      - name: Install Dependencies
+        run: flutter pub get
+
+      - name: Run Static Code Analysis
+        run: flutter analyze
+
+      - name: Run Test Suite
+        run: flutter test
+
+      - name: Build Android Release APK
+        run: flutter build apk --release
+
+      - name: Upload Installable APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: UZHAVAN360-release-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
+          retention-days: 14
