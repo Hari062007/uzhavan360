@@ -54,16 +54,17 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
   @override
   Widget build(BuildContext context) {
     final auth = Provider.of<AuthProvider>(context);
-    const instructionVoice = 'உங்கள் மொபைல் எண்ணிற்கு வந்த 6 இலக்க OTP எண்ணை உள்ளிடவும்.';
 
     return Scaffold(
       backgroundColor: AppColors.backgroundWhite,
       appBar: AppBar(
-        title: const Text('OTP சரிபார்ப்பு'),
-        actions: const [
+        title: Text(context.tr('otp_title')),
+        actions: [
           Padding(
-            padding: EdgeInsets.only(right: 16.0),
-            child: VoiceSpeakerButton(textToSpeak: instructionVoice),
+            padding: const EdgeInsets.only(right: 16.0),
+            child: VoiceSpeakerButton(
+              textToSpeak: context.tr('otp_voice_instruction'),
+            ),
           ),
         ],
       ),
@@ -120,8 +121,8 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
 
               // 6-digit OTP Input
               UzhavanTextField(
-                label: 'OTP எண்',
-                hint: '6 இலக்க எண் (எ.கா: 123456)',
+                label: context.tr('otp_label'),
+                hint: context.tr('otp_hint'),
                 controller: _otpController,
                 keyboardType: TextInputType.number,
                 prefix: const Icon(Icons.lock_clock_outlined, color: AppColors.primaryGreen),
@@ -196,7 +197,6 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
 
               const SizedBox(height: 28),
 
-              // Verify & Login Button
               UzhavanButton(
                 label: context.tr('verify_otp_btn'),
                 icon: Icons.check_circle_outline,

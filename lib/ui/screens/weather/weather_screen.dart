@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/localization/app_localizations.dart';
 import '../../../state/weather_provider.dart';
 import '../../common/voice_speaker_button.dart';
 
@@ -11,15 +12,21 @@ class WeatherScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final weatherProv = Provider.of<WeatherProvider>(context);
     final weather = weatherProv.weather;
+    final lang = Localizations.localeOf(context).languageCode;
+
+    final condition = weather != null ? (lang == 'ta' ? weather.conditionTa : weather.conditionEn) : '';
+    final advisory = weather != null ? (lang == 'ta' ? weather.advisoryTa : weather.advisoryEn) : '';
+    final village = weather != null ? (lang == 'ta' ? weather.villageTa : weather.village) : '';
+    final district = weather != null ? (lang == 'ta' ? weather.districtTa : weather.district) : '';
 
     final voiceText = weather != null
-        ? '${weather.village} வானிலை நிலவரம். வெப்பநிலை ${weather.temperature.toStringAsFixed(0)} டிகிரி செல்சியஸ். ${weather.conditionTa}. வேளாண் ஆலோசனை: ${weather.advisoryTa}'
-        : 'வானிலை நிலவரம் ஏற்றப்படுகிறது.';
+        ? '$village. ${weather.temperature.toStringAsFixed(0)}°C. $condition. $advisory'
+        : context.tr('loading');
 
     return Scaffold(
       backgroundColor: AppColors.backgroundWhite,
       appBar: AppBar(
-        title: const Text('வேளாண் வானிலை நிலவரம்'),
+        title: Text(context.tr('weather_screen_title')),
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 16.0),
@@ -61,7 +68,7 @@ class WeatherScreen extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  weather.village,
+                                  village,
                                   style: const TextStyle(
                                     fontSize: 22,
                                     fontWeight: FontWeight.bold,
@@ -69,7 +76,7 @@ class WeatherScreen extends StatelessWidget {
                                   ),
                                 ),
                                 Text(
-                                  '${weather.district} மாவட்டம்',
+                                  '$district ${context.tr('district_suffix')}',
                                   style: const TextStyle(fontSize: 14, color: Colors.white70),
                                 ),
                               ],
@@ -101,7 +108,7 @@ class WeatherScreen extends StatelessWidget {
                             const SizedBox(width: 14),
                             Expanded(
                               child: Text(
-                                weather.conditionTa,
+                                condition,
                                 style: const TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
@@ -117,9 +124,9 @@ class WeatherScreen extends StatelessWidget {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
-                            _buildWeatherMetric(Icons.water_drop_outlined, 'மழை வாய்ப்பு', '${weather.rainProbability}%'),
-                            _buildWeatherMetric(Icons.opacity, 'ஈரப்பதம்', '${weather.humidity}%'),
-                            _buildWeatherMetric(Icons.air, 'காற்று வேகம்', '${weather.windSpeedKm.toStringAsFixed(1)} கி.மீ/ம'),
+                            _buildWeatherMetric(Icons.water_drop_outlined, context.tr('rain_chance_label'), '${weather.rainProbability}%'),
+                            _buildWeatherMetric(Icons.opacity, context.tr('humidity_label'), '${weather.humidity}%'),
+                            _buildWeatherMetric(Icons.air, context.tr('wind_speed_label'), '${weather.windSpeedKm.toStringAsFixed(1)} ${context.tr('wind_unit')}'),
                           ],
                         ),
                       ],
@@ -138,32 +145,23 @@ class WeatherScreen extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Row(
+                          Row(
                             children: [
-                              Icon(Icons.tips_and_updates_outlined, color: AppColors.primaryGreen, size: 24),
-                              SizedBox(width: 10),
+                              const Icon(Icons.tips_and_updates_outlined, color: AppColors.primaryGreen, size: 24),
+                              const SizedBox(width: 10),
                               Text(
-                                'விவசாயிகளுக்கான வழிகாட்டல்',
-                                style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+                                context.tr('agro_advisory_title'),
+                                style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
                               ),
                             ],
                           ),
                           const SizedBox(height: 12),
                           Text(
-                            weather.advisoryTa,
+                            advisory,
                             style: const TextStyle(
                               fontSize: 15,
                               color: AppColors.textPrimary,
                               height: 1.45,
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                          Text(
-                            weather.advisoryEn,
-                            style: const TextStyle(
-                              fontSize: 13,
-                              color: AppColors.textMuted,
-                              fontStyle: FontStyle.italic,
                             ),
                           ),
                         ],

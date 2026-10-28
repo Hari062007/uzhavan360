@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../core/localization/app_localizations.dart';
 import '../../core/services/tts_service.dart';
 import '../../core/theme/app_colors.dart';
 import '../../state/locale_provider.dart';
@@ -28,9 +29,9 @@ class _VoiceSpeakerButtonState extends State<VoiceSpeakerButton> {
     final lang = Provider.of<LocaleProvider>(context, listen: false).locale.languageCode;
     if (_speaking) {
       await _tts.stop();
-      setState(() => _speaking = false);
+      if (mounted) setState(() => _speaking = false);
     } else {
-      setState(() => _speaking = true);
+      if (mounted) setState(() => _speaking = true);
       await _tts.speak(widget.textToSpeak, language: lang);
       if (mounted) {
         setState(() => _speaking = false);
@@ -56,7 +57,7 @@ class _VoiceSpeakerButtonState extends State<VoiceSpeakerButton> {
           _speaking ? Icons.volume_up : Icons.volume_up_outlined,
           color: _speaking ? AppColors.accentGold : AppColors.primaryGreen,
         ),
-        tooltip: widget.tooltip ?? 'கேட்க தொடவும்',
+        tooltip: widget.tooltip ?? context.tr('voice_help_tooltip'),
         onPressed: () => _toggleSpeak(context),
       ),
     );

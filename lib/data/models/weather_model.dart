@@ -1,6 +1,8 @@
 class WeatherData {
   final String district;
+  final String districtTa;
   final String village;
+  final String villageTa;
   final double temperature;
   final String conditionTa;
   final String conditionEn;
@@ -13,7 +15,9 @@ class WeatherData {
 
   WeatherData({
     required this.district,
+    this.districtTa = 'மதுரை',
     required this.village,
+    this.villageTa = 'ஆலங்குளம்',
     required this.temperature,
     required this.conditionTa,
     required this.conditionEn,
@@ -28,7 +32,9 @@ class WeatherData {
   factory WeatherData.fromJson(Map<String, dynamic> json) {
     return WeatherData(
       district: json['district'] as String? ?? 'Madurai',
+      districtTa: json['district_ta'] as String? ?? 'மதுரை',
       village: json['village'] as String? ?? 'Alangottaram',
+      villageTa: json['village_ta'] as String? ?? 'ஆலங்குளம்',
       temperature: (json['temperature'] as num?)?.toDouble() ?? 31.0,
       conditionTa: json['condition_ta'] as String? ?? 'மிதமான மேகமூட்டம்',
       conditionEn: json['condition_en'] as String? ?? 'Partly Cloudy',
@@ -48,7 +54,9 @@ class WeatherData {
   Map<String, dynamic> toJson() {
     return {
       'district': district,
+      'district_ta': districtTa,
       'village': village,
+      'village_ta': villageTa,
       'temperature': temperature,
       'condition_ta': conditionTa,
       'condition_en': conditionEn,

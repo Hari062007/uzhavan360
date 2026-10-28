@@ -35,20 +35,24 @@ class ProfileScreen extends StatelessWidget {
     final profile = Provider.of<ProfileProvider>(context);
     final localeProv = Provider.of<LocaleProvider>(context);
     final phone = StorageService.getPhoneNumber() ?? '+91 98421 00000';
-
-    const voiceText =
-        'சுயவிவரம் மற்றும் அமைப்புகள். உங்கள் கிராமத்தை மாற்றலாம், பணியை மாற்றலாம் மற்றும் மொழியைத் தேர்ந்தெடுக்கலாம்.';
+    final lang = Localizations.localeOf(context).languageCode;
+    final village = lang == 'ta' ? profile.selectedVillageTa : profile.selectedVillage;
+    final taluk = lang == 'ta' ? profile.selectedTalukTa : profile.selectedTaluk;
+    final district = lang == 'ta' ? profile.selectedDistrictTa : profile.selectedDistrict;
+    final userName = profile.fullName.isNotEmpty ? profile.fullName : context.tr('farmer_default');
 
     return Scaffold(
       backgroundColor: AppColors.backgroundWhite,
       appBar: isTab
           ? null
           : AppBar(
-              title: const Text('சுயவிவரம் & அமைப்புகள்'),
-              actions: const [
+              title: Text(context.tr('profile_title')),
+              actions: [
                 Padding(
-                  padding: EdgeInsets.only(right: 16.0),
-                  child: VoiceSpeakerButton(textToSpeak: voiceText),
+                  padding: const EdgeInsets.only(right: 16.0),
+                  child: VoiceSpeakerButton(
+                    textToSpeak: context.tr('profile_voice_instruction'),
+                  ),
                 ),
               ],
             ),
@@ -83,7 +87,7 @@ class ProfileScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            profile.fullName.isNotEmpty ? profile.fullName : 'விவசாயி',
+                            userName,
                             style: const TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
@@ -121,7 +125,10 @@ class ProfileScreen extends StatelessWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text('தற்போதைய பணி (Role)', style: TextStyle(fontSize: 13, color: AppColors.textMuted)),
+                          Text(
+                            context.tr('current_role'),
+                            style: const TextStyle(fontSize: 13, color: AppColors.textMuted),
+                          ),
                           TextButton(
                             style: TextButton.styleFrom(visualDensity: VisualDensity.compact),
                             onPressed: () {
@@ -130,7 +137,10 @@ class ProfileScreen extends StatelessWidget {
                                 MaterialPageRoute(builder: (_) => const RoleSelectionScreen()),
                               );
                             },
-                            child: const Text('மாற்றுக', style: TextStyle(fontWeight: FontWeight.bold)),
+                            child: Text(
+                              context.tr('change_btn'),
+                              style: const TextStyle(fontWeight: FontWeight.bold),
+                            ),
                           ),
                         ],
                       ),
@@ -140,16 +150,10 @@ class ProfileScreen extends StatelessWidget {
                           const SizedBox(width: 10),
                           Expanded(
                             child: Text(
-                              profile.selectedRole.titleTa,
+                              profile.selectedRole.localizedTitle(context),
                               style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
                             ),
                           ),
-                          if (profile.selectedRole == AppRole.panchayatOfficial)
-                            Icon(
-                              profile.isOfficialVerified ? Icons.verified : Icons.help_outline,
-                              color: profile.isOfficialVerified ? AppColors.primaryGreen : const Color(0xFFD97706),
-                              size: 20,
-                            ),
                         ],
                       ),
                     ],
@@ -172,7 +176,10 @@ class ProfileScreen extends StatelessWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text('கிராமம் & இருப்பிடம்', style: TextStyle(fontSize: 13, color: AppColors.textMuted)),
+                          Text(
+                            context.tr('village_location'),
+                            style: const TextStyle(fontSize: 13, color: AppColors.textMuted),
+                          ),
                           TextButton(
                             style: TextButton.styleFrom(visualDensity: VisualDensity.compact),
                             onPressed: () {
@@ -181,7 +188,10 @@ class ProfileScreen extends StatelessWidget {
                                 MaterialPageRoute(builder: (_) => const VillageSelectionScreen()),
                               );
                             },
-                            child: const Text('மாற்றுக', style: TextStyle(fontWeight: FontWeight.bold)),
+                            child: Text(
+                              context.tr('change_btn'),
+                              style: const TextStyle(fontWeight: FontWeight.bold),
+                            ),
                           ),
                         ],
                       ),
@@ -194,11 +204,11 @@ class ProfileScreen extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  profile.selectedVillageTa,
+                                  village,
                                   style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
                                 ),
                                 Text(
-                                  '${profile.selectedTalukTa} வட்டம், ${profile.selectedDistrictTa} மாவட்டம்',
+                                  '$taluk ${context.tr('taluk_suffix')}, $district ${context.tr('district_suffix')}',
                                   style: const TextStyle(fontSize: 13, color: AppColors.textSecondary),
                                 ),
                               ],
@@ -223,13 +233,13 @@ class ProfileScreen extends StatelessWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Row(
+                      Row(
                         children: [
-                          Icon(Icons.language, color: AppColors.primaryGreen, size: 22),
-                          SizedBox(width: 10),
+                          const Icon(Icons.language, color: AppColors.primaryGreen, size: 22),
+                          const SizedBox(width: 10),
                           Text(
-                            'பயன்பாட்டு மொழி',
-                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                            context.tr('app_language'),
+                            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                           ),
                         ],
                       ),
@@ -258,14 +268,14 @@ class ProfileScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(14),
                   border: Border.all(color: AppColors.borderSubtle),
                 ),
-                child: const Row(
+                child: Row(
                   children: [
-                    Icon(Icons.shield_outlined, color: AppColors.primaryGreen, size: 22),
-                    SizedBox(width: 10),
+                    const Icon(Icons.shield_outlined, color: AppColors.primaryGreen, size: 22),
+                    const SizedBox(width: 10),
                     Expanded(
                       child: Text(
-                        'UZHAVAN360 உங்கள் தனியுரிமையைப் பாதுகாக்கிறது. உங்கள் வெளிப்படையான ஒப்புதல் இன்றி தொலைபேசி எண் பொதுவில் பகிரப்படாது.',
-                        style: TextStyle(fontSize: 12, color: AppColors.textSecondary, height: 1.3),
+                        context.tr('privacy_statement'),
+                        style: const TextStyle(fontSize: 12, color: AppColors.textSecondary, height: 1.3),
                       ),
                     ),
                   ],

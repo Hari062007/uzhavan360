@@ -19,22 +19,21 @@ class JobListingsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final jobProv = Provider.of<JobProvider>(context);
     final profile = Provider.of<ProfileProvider>(context);
-    final canPost = profile.selectedRole == AppRole.workerLandowner ||
-                    profile.selectedRole == AppRole.landownerTrader;
+    final lang = Localizations.localeOf(context).languageCode;
+    final canPost = profile.selectedRole == AppRole.owner ||
+        profile.selectedRole == AppRole.workerLandowner ||
+        profile.selectedRole == AppRole.landownerTrader;
 
-    const voiceText =
-        'உங்கள் கிராமத்திலும் அருகிலுள்ள கிராமங்களிலும் கிடைக்கும் விவசாய வேலை வாய்ப்புகள் இங்கே உள்ளன.';
-
-    final content = Scaffold(
+    return Scaffold(
       backgroundColor: AppColors.backgroundWhite,
       appBar: isTab
           ? null
           : AppBar(
               title: Text(context.tr('jobs_title')),
-              actions: const [
+              actions: [
                 Padding(
-                  padding: EdgeInsets.only(right: 16.0),
-                  child: VoiceSpeakerButton(textToSpeak: voiceText),
+                  padding: const EdgeInsets.only(right: 16.0),
+                  child: VoiceSpeakerButton(textToSpeak: context.tr('job_listings_voice')),
                 ),
               ],
             ),
@@ -46,13 +45,13 @@ class JobListingsScreen extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             child: Row(
               children: [
-                _buildFilterChip(context, jobProv, '', 'அனைத்து வேலைகள்'),
+                _buildFilterChip(context, jobProv, '', context.tr('all_jobs')),
                 const SizedBox(width: 8),
-                _buildFilterChip(context, jobProv, 'harvesting', 'அறுவடை'),
+                _buildFilterChip(context, jobProv, 'harvesting', context.tr('harvesting')),
                 const SizedBox(width: 8),
-                _buildFilterChip(context, jobProv, 'weeding', 'நடவு & களை'),
+                _buildFilterChip(context, jobProv, 'weeding', context.tr('sowing_weeding')),
                 const SizedBox(width: 8),
-                _buildFilterChip(context, jobProv, 'machinery', 'இயந்திரம் / மரம் ஏறுதல்'),
+                _buildFilterChip(context, jobProv, 'machinery', context.tr('machinery_climbing')),
               ],
             ),
           ),
@@ -63,9 +62,9 @@ class JobListingsScreen extends StatelessWidget {
             child: jobProv.isLoading
                 ? const Center(child: CircularProgressIndicator(color: AppColors.primaryGreen))
                 : jobProv.jobs.isEmpty
-                    ? const EmptyStateView(
-                        title: 'தற்போது வேலைகள் எதுவும் இல்லை',
-                        subtitle: 'உங்கள் கிராமத்தில் புதிய வேலைகள் பதிவிடப்படும்போது இங்கே காட்டப்படும்.',
+                    ? EmptyStateView(
+                        title: context.tr('no_jobs_title'),
+                        subtitle: context.tr('no_jobs_sub'),
                         icon: Icons.work_off_outlined,
                       )
                     : RefreshIndicator(
@@ -77,6 +76,8 @@ class JobListingsScreen extends StatelessWidget {
                           itemBuilder: (context, index) {
                             final job = jobProv.jobs[index];
                             final hasApplied = jobProv.hasApplied(job.id);
+                            final jobTitle = lang == 'ta' ? job.titleTa : job.titleEn;
+                            final secondaryTitle = lang == 'ta' ? job.titleEn : job.titleTa;
 
                             return Card(
                               margin: const EdgeInsets.only(bottom: 14),
@@ -124,9 +125,9 @@ class JobListingsScreen extends StatelessWidget {
                                                 color: const Color(0xFFE0F2FE),
                                                 borderRadius: BorderRadius.circular(8),
                                               ),
-                                              child: const Text(
-                                                'விண்ணப்பித்தவை',
-                                                style: TextStyle(
+                                              child: Text(
+                                                context.tr('applied_badge'),
+                                                style: const TextStyle(
                                                   fontSize: 11,
                                                   fontWeight: FontWeight.bold,
                                                   color: Color(0xFF0369A1),
@@ -135,7 +136,7 @@ class JobListingsScreen extends StatelessWidget {
                                             )
                                           else
                                             Text(
-                                              '${job.workersRequired - job.workersHired} ஆட்கள் தேவை',
+                                              '${job.workersRequired - job.workersHired} ${context.tr('workers_needed_label')}',
                                               style: const TextStyle(
                                                 fontSize: 13,
                                                 fontWeight: FontWeight.bold,
@@ -146,7 +147,7 @@ class JobListingsScreen extends StatelessWidget {
                                       ),
                                       const SizedBox(height: 10),
                                       Text(
-                                        job.titleTa,
+                                        jobTitle,
                                         style: const TextStyle(
                                           fontSize: 17,
                                           fontWeight: FontWeight.bold,
@@ -155,7 +156,7 @@ class JobListingsScreen extends StatelessWidget {
                                       ),
                                       const SizedBox(height: 4),
                                       Text(
-                                        job.titleEn,
+                                        secondaryTitle,
                                         style: const TextStyle(
                                           fontSize: 13,
                                           color: AppColors.textMuted,
@@ -177,7 +178,7 @@ class JobListingsScreen extends StatelessWidget {
                                                 ),
                                               ),
                                               Text(
-                                                job.wageBasis == 'daily' ? '/ நாள் ஒன்றுக்கு' : '/ ஏக்கர்',
+                                                job.wageBasis == 'daily' ? context.tr('per_day_unit') : context.tr('per_acre'),
                                                 style: const TextStyle(
                                                   fontSize: 13,
                                                   color: AppColors.textSecondary,
@@ -213,7 +214,7 @@ class JobListingsScreen extends StatelessWidget {
               backgroundColor: AppColors.primaryGreen,
               foregroundColor: Colors.white,
               icon: const Icon(Icons.add),
-              label: const Text('ஆட்கள் தேவை பதிவு', style: TextStyle(fontWeight: FontWeight.bold)),
+              label: Text(context.tr('post_job_fab'), style: const TextStyle(fontWeight: FontWeight.bold)),
               onPressed: () {
                 Navigator.push(
                   context,
@@ -223,8 +224,6 @@ class JobListingsScreen extends StatelessWidget {
             )
           : null,
     );
-
-    return content;
   }
 
   Widget _buildFilterChip(BuildContext context, JobProvider prov, String code, String label) {

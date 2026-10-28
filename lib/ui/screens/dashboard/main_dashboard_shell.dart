@@ -6,14 +6,10 @@ import '../../../data/models/user_role.dart';
 import '../../../state/profile_provider.dart';
 import '../../common/voice_speaker_button.dart';
 import 'worker_dashboard.dart';
-import 'worker_landowner_dashboard.dart';
-import 'landowner_trader_dashboard.dart';
+import 'owner_dashboard.dart';
 import 'trader_dashboard.dart';
-import 'panchayat_dashboard.dart';
 import '../jobs/job_listings_screen.dart';
 import '../market/crop_prices_screen.dart';
-import '../schemes/schemes_screen.dart';
-import '../panchayat/announcements_screen.dart';
 import '../profile/profile_screen.dart';
 import '../onboarding/village_selection_screen.dart';
 
@@ -29,15 +25,14 @@ class _MainDashboardShellState extends State<MainDashboardShell> {
 
   Widget _getRoleBasedHome(AppRole role) {
     switch (role) {
+      case AppRole.owner:
       case AppRole.workerLandowner:
-        return const WorkerLandownerDashboard();
       case AppRole.landownerTrader:
-        return const LandownerTraderDashboard();
+        return const OwnerDashboard();
       case AppRole.trader:
         return const TraderDashboard();
-      case AppRole.panchayatOfficial:
-        return const PanchayatDashboard();
       case AppRole.worker:
+      case AppRole.panchayatOfficial:
         return const WorkerDashboard();
     }
   }
@@ -45,21 +40,25 @@ class _MainDashboardShellState extends State<MainDashboardShell> {
   @override
   Widget build(BuildContext context) {
     final profile = Provider.of<ProfileProvider>(context);
+    final lang = Localizations.localeOf(context).languageCode;
+    final village = lang == 'ta' ? profile.selectedVillageTa : profile.selectedVillage;
 
     final List<Widget> pages = [
       _getRoleBasedHome(profile.selectedRole),
       const JobListingsScreen(isTab: true),
       const CropPricesScreen(isTab: true),
-      const SchemesScreen(isTab: true),
-      const AnnouncementsScreen(isTab: true),
       const ProfileScreen(isTab: true),
     ];
+
+    final voiceWelcome = lang == 'ta'
+        ? 'UZHAVAN360 செயலிற்கு நல்வரவு. வேலைகள், சந்தை விலை மற்றும் உங்கள் சுயவிவரத்தைக் கீழேயுள்ள பட்டியலைத் தொட்டுப் பார்க்கலாம்.'
+        : 'Welcome to UZHAVAN360. Explore jobs, crop market prices, and manage your profile using the navigation tabs below.';
 
     return Scaffold(
       backgroundColor: AppColors.backgroundWhite,
       appBar: AppBar(
         leading: Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.all(6.0),
           child: Image.asset(
             'assets/images/uzhavan360_logo.jpg',
             fit: BoxFit.contain,
@@ -89,7 +88,7 @@ class _MainDashboardShellState extends State<MainDashboardShell> {
                   const Icon(Icons.location_on, size: 12, color: AppColors.primaryGreen),
                   const SizedBox(width: 3),
                   Text(
-                    '${profile.selectedVillageTa} ▼',
+                    '$village ▼',
                     style: const TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
@@ -101,12 +100,10 @@ class _MainDashboardShellState extends State<MainDashboardShell> {
             ),
           ],
         ),
-        actions: const [
+        actions: [
           Padding(
-            padding: EdgeInsets.only(right: 14.0),
-            child: VoiceSpeakerButton(
-              textToSpeak: 'UZHAVAN360 செயலியின் முதன்மைப் பக்கம். கீழேயுள்ள பட்டியலைத் தொட்டு வேலைகள், சந்தை விலை மற்றும் அரசு திட்டங்களைப் பார்க்கலாம்.',
-            ),
+            padding: const EdgeInsets.only(right: 14.0),
+            child: VoiceSpeakerButton(textToSpeak: voiceWelcome),
           ),
         ],
       ),
@@ -135,16 +132,6 @@ class _MainDashboardShellState extends State<MainDashboardShell> {
             icon: const Icon(Icons.storefront_outlined),
             selectedIcon: const Icon(Icons.storefront, color: AppColors.primaryGreen),
             label: context.tr('nav_market'),
-          ),
-          NavigationDestination(
-            icon: const Icon(Icons.account_balance_outlined),
-            selectedIcon: const Icon(Icons.account_balance, color: AppColors.primaryGreen),
-            label: context.tr('nav_schemes'),
-          ),
-          NavigationDestination(
-            icon: const Icon(Icons.campaign_outlined),
-            selectedIcon: const Icon(Icons.campaign, color: AppColors.primaryGreen),
-            label: context.tr('nav_panchayat'),
           ),
           NavigationDestination(
             icon: const Icon(Icons.person_outline),

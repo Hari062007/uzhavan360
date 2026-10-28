@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/localization/app_localizations.dart';
 import '../../../core/constants/tamil_nadu_locations.dart';
 import '../../../state/profile_provider.dart';
 import '../../common/uzhavan_button.dart';
@@ -40,10 +41,12 @@ class _VillageSelectionScreenState extends State<VillageSelectionScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final lang = Localizations.localeOf(context).languageCode;
+
     return Scaffold(
       backgroundColor: AppColors.backgroundWhite,
       appBar: AppBar(
-        title: const Text('கிராமத்தைத் தேர்ந்தெடுத்தல்'),
+        title: Text(context.tr('select_village_title')),
       ),
       body: SafeArea(
         child: Padding(
@@ -52,9 +55,9 @@ class _VillageSelectionScreenState extends State<VillageSelectionScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               // District Selector
-              const Text(
-                '1. மாவட்டம் (District)',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
+              Text(
+                context.tr('step_district'),
+                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
               ),
               const SizedBox(height: 8),
               Container(
@@ -70,9 +73,10 @@ class _VillageSelectionScreenState extends State<VillageSelectionScreen> {
                     isExpanded: true,
                     icon: const Icon(Icons.arrow_drop_down, color: AppColors.primaryGreen),
                     items: TamilNaduLocations.data.map((d) {
+                      final label = lang == 'ta' ? '${d.districtTa} (${d.district})' : '${d.district} (${d.districtTa})';
                       return DropdownMenuItem<LocationHierarchy>(
                         value: d,
-                        child: Text('${d.districtTa} (${d.district})', style: const TextStyle(fontSize: 16)),
+                        child: Text(label, style: const TextStyle(fontSize: 16)),
                       );
                     }).toList(),
                     onChanged: (newDist) {
@@ -90,9 +94,9 @@ class _VillageSelectionScreenState extends State<VillageSelectionScreen> {
               const SizedBox(height: 20),
 
               // Taluk Selector
-              const Text(
-                '2. வட்டம் / தாலுகா (Taluk)',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
+              Text(
+                context.tr('step_taluk'),
+                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
               ),
               const SizedBox(height: 8),
               Container(
@@ -108,9 +112,10 @@ class _VillageSelectionScreenState extends State<VillageSelectionScreen> {
                     isExpanded: true,
                     icon: const Icon(Icons.arrow_drop_down, color: AppColors.primaryGreen),
                     items: _selectedDistrict.taluks.map((t) {
+                      final label = lang == 'ta' ? '${t.talukTa} (${t.taluk})' : '${t.taluk} (${t.talukTa})';
                       return DropdownMenuItem<TalukData>(
                         value: t,
-                        child: Text('${t.talukTa} (${t.taluk})', style: const TextStyle(fontSize: 16)),
+                        child: Text(label, style: const TextStyle(fontSize: 16)),
                       );
                     }).toList(),
                     onChanged: (newTaluk) {
@@ -127,9 +132,9 @@ class _VillageSelectionScreenState extends State<VillageSelectionScreen> {
               const SizedBox(height: 20),
 
               // Village List
-              const Text(
-                '3. பஞ்சாயத்து கிராமம் (Panchayat Village)',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
+              Text(
+                context.tr('step_village'),
+                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
               ),
               const SizedBox(height: 8),
               Expanded(
@@ -138,6 +143,9 @@ class _VillageSelectionScreenState extends State<VillageSelectionScreen> {
                   itemBuilder: (context, index) {
                     final village = _selectedTaluk.villages[index];
                     final isSelected = village.name == _selectedVillage.name;
+                    final villageLabel = lang == 'ta'
+                        ? '${village.nameTa} (${village.name})'
+                        : '${village.name} (${village.nameTa})';
 
                     return Card(
                       elevation: isSelected ? 2 : 0,
@@ -156,14 +164,14 @@ class _VillageSelectionScreenState extends State<VillageSelectionScreen> {
                           color: isSelected ? AppColors.primaryGreen : AppColors.textMuted,
                         ),
                         title: Text(
-                          '${village.nameTa} (${village.name})',
+                          villageLabel,
                           style: TextStyle(
                             fontSize: 17,
                             fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
                             color: isSelected ? AppColors.primaryGreenDark : AppColors.textPrimary,
                           ),
                         ),
-                        subtitle: Text('அஞ்சல் குறியீடு: ${village.pincode}'),
+                        subtitle: Text('${context.tr('pincode_label')}${village.pincode}'),
                         onTap: () {
                           setState(() => _selectedVillage = village);
                         },
@@ -175,7 +183,7 @@ class _VillageSelectionScreenState extends State<VillageSelectionScreen> {
 
               const SizedBox(height: 16),
               UzhavanButton(
-                label: 'கிராமத்தை உறுதி செய்க',
+                label: context.tr('confirm_village_btn'),
                 icon: Icons.check,
                 onPressed: _confirmSelection,
               ),

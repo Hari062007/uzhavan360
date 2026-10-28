@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import '../../core/localization/app_localizations.dart';
 
 enum AppRole {
   worker,
+  owner,
+  trader,
   workerLandowner,
   landownerTrader,
-  trader,
   panchayatOfficial,
 }
 
@@ -13,6 +15,8 @@ extension AppRoleExtension on AppRole {
     switch (this) {
       case AppRole.worker:
         return 'worker';
+      case AppRole.owner:
+        return 'owner';
       case AppRole.workerLandowner:
         return 'worker_landowner';
       case AppRole.landownerTrader:
@@ -28,6 +32,8 @@ extension AppRoleExtension on AppRole {
     switch (this) {
       case AppRole.worker:
         return 'விவசாயத் தொழிலாளி';
+      case AppRole.owner:
+        return 'நில உரிமையாளர்';
       case AppRole.workerLandowner:
         return 'தொழிலாளி + நில உரிமையாளர்';
       case AppRole.landownerTrader:
@@ -43,6 +49,8 @@ extension AppRoleExtension on AppRole {
     switch (this) {
       case AppRole.worker:
         return 'Agricultural Worker';
+      case AppRole.owner:
+        return 'Landowner';
       case AppRole.workerLandowner:
         return 'Worker + Landowner';
       case AppRole.landownerTrader:
@@ -58,6 +66,8 @@ extension AppRoleExtension on AppRole {
     switch (this) {
       case AppRole.worker:
         return 'தினசரி பண்ணை வேலை மற்றும் கூலி வாய்ப்புகளைக் கண்டறியலாம்';
+      case AppRole.owner:
+        return 'வேலைகளுக்கு ஆட்கள் சேர்க்கலாம் மற்றும் பயிர் விலை நிலவரங்களைப் பார்க்கலாம்';
       case AppRole.workerLandowner:
         return 'வேலைகளுக்கு ஆட்கள் சேர்க்கலாம் மற்றும் வேலைகளில் ஈடுபடலாம்';
       case AppRole.landownerTrader:
@@ -73,6 +83,8 @@ extension AppRoleExtension on AppRole {
     switch (this) {
       case AppRole.worker:
         return 'Find daily agricultural wage labor and harvesting work';
+      case AppRole.owner:
+        return 'Post labor requirements and track crop market prices';
       case AppRole.workerLandowner:
         return 'Post labor requirements and engage in agricultural operations';
       case AppRole.landownerTrader:
@@ -84,10 +96,41 @@ extension AppRoleExtension on AppRole {
     }
   }
 
+  String localizedTitle(BuildContext context) {
+    switch (this) {
+      case AppRole.worker:
+        return context.tr('role_worker');
+      case AppRole.owner:
+      case AppRole.workerLandowner:
+      case AppRole.landownerTrader:
+        return context.tr('role_owner');
+      case AppRole.trader:
+        return context.tr('role_trader');
+      case AppRole.panchayatOfficial:
+        return context.tr('role_official');
+    }
+  }
+
+  String localizedDesc(BuildContext context) {
+    switch (this) {
+      case AppRole.worker:
+        return context.tr('role_worker_desc');
+      case AppRole.owner:
+      case AppRole.workerLandowner:
+      case AppRole.landownerTrader:
+        return context.tr('role_owner_desc');
+      case AppRole.trader:
+        return context.tr('role_trader_desc');
+      case AppRole.panchayatOfficial:
+        return context.tr('role_official_desc');
+    }
+  }
+
   IconData get icon {
     switch (this) {
       case AppRole.worker:
         return Icons.agriculture;
+      case AppRole.owner:
       case AppRole.workerLandowner:
         return Icons.nature_people;
       case AppRole.landownerTrader:
@@ -101,10 +144,10 @@ extension AppRoleExtension on AppRole {
 
   static AppRole fromCode(String code) {
     switch (code) {
+      case 'owner':
       case 'worker_landowner':
-        return AppRole.workerLandowner;
       case 'landowner_trader':
-        return AppRole.landownerTrader;
+        return AppRole.owner;
       case 'trader':
         return AppRole.trader;
       case 'panchayat_official':

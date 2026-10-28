@@ -36,8 +36,8 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
   void _proceed(ProfileProvider profile) {
     if (_nameController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('தயவுசெய்து உங்கள் பெயரை உள்ளிடவும்'),
+        SnackBar(
+          content: Text(context.tr('name_required')),
           backgroundColor: AppColors.error,
         ),
       );
@@ -55,16 +55,21 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
   Widget build(BuildContext context) {
     final profile = Provider.of<ProfileProvider>(context);
     final verifiedPhone = StorageService.getPhoneNumber() ?? '+91 98421 00000';
-    const voiceInstruction = 'உங்கள் பெயர் மற்றும் கிராம விவரங்களை உள்ளிட்டு சேமிக்கவும்.';
+    final lang = Localizations.localeOf(context).languageCode;
+    final village = lang == 'ta' ? profile.selectedVillageTa : profile.selectedVillage;
+    final taluk = lang == 'ta' ? profile.selectedTalukTa : profile.selectedTaluk;
+    final district = lang == 'ta' ? profile.selectedDistrictTa : profile.selectedDistrict;
 
     return Scaffold(
       backgroundColor: AppColors.backgroundWhite,
       appBar: AppBar(
         title: Text(context.tr('profile_setup_title')),
-        actions: const [
+        actions: [
           Padding(
-            padding: EdgeInsets.only(right: 16.0),
-            child: VoiceSpeakerButton(textToSpeak: voiceInstruction),
+            padding: const EdgeInsets.only(right: 16.0),
+            child: VoiceSpeakerButton(
+              textToSpeak: context.tr('profile_voice_instruction'),
+            ),
           ),
         ],
       ),
@@ -99,9 +104,9 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          'சரிபார்க்கப்பட்ட மொபைல் எண்',
-                          style: TextStyle(fontSize: 12, color: AppColors.textMuted),
+                        Text(
+                          context.tr('verified_phone'),
+                          style: const TextStyle(fontSize: 12, color: AppColors.textMuted),
                         ),
                         const SizedBox(height: 2),
                         Text(
@@ -122,16 +127,16 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
               // Full Name
               UzhavanTextField(
                 label: context.tr('full_name_label'),
-                hint: 'எ.கா: வேலுச்சாமி',
+                hint: context.tr('name_hint'),
                 controller: _nameController,
                 prefix: const Icon(Icons.person_outline, color: AppColors.primaryGreen),
               ),
               const SizedBox(height: 24),
 
               // Village Card with hierarchy
-              const Text(
-                'கிராமம் மற்றும் இருப்பிடம்',
-                style: TextStyle(
+              Text(
+                context.tr('village_location'),
+                style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                   color: AppColors.textPrimary,
@@ -156,7 +161,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                '${profile.selectedVillageTa} (${profile.selectedVillage})',
+                                village,
                                 style: const TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
@@ -165,7 +170,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                               ),
                               const SizedBox(height: 2),
                               Text(
-                                '${profile.selectedTalukTa} வட்டம், ${profile.selectedDistrictTa} மாவட்டம்',
+                                '$taluk ${context.tr('taluk_suffix')}, $district ${context.tr('district_suffix')}',
                                 style: const TextStyle(
                                   fontSize: 14,
                                   color: AppColors.textSecondary,
@@ -188,9 +193,9 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                             ),
                             icon: const Icon(Icons.my_location, size: 18, color: AppColors.primaryGreen),
-                            label: const Text(
-                              'தானாகக் கண்டறி',
-                              style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppColors.primaryGreen),
+                            label: Text(
+                              context.tr('auto_detect_location'),
+                              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppColors.primaryGreen),
                             ),
                             onPressed: () => profile.autoDetectLocation(),
                           ),
@@ -205,9 +210,9 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                             ),
                             icon: const Icon(Icons.edit_location_alt, size: 18),
-                            label: const Text(
-                              'நேரடியாகத் தேர்வு',
-                              style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                            label: Text(
+                              context.tr('manual_select_location'),
+                              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
                             ),
                             onPressed: () {
                               Navigator.push(
@@ -225,9 +230,8 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
 
               const SizedBox(height: 36),
 
-              // Continue to role selection
               UzhavanButton(
-                label: 'அடுத்த பகுதி: பணித் தேர்வு',
+                label: context.tr('continue_to_role'),
                 icon: Icons.arrow_forward_rounded,
                 onPressed: () => _proceed(profile),
               ),

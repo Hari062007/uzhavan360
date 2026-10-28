@@ -17,9 +17,10 @@ class TraderDashboard extends StatelessWidget {
   Widget build(BuildContext context) {
     final profile = Provider.of<ProfileProvider>(context);
     final cropProv = Provider.of<CropPriceProvider>(context);
-
-    const voiceText =
-        'வணக்கம்! நீங்கள் தினசரி விளைபொருள் கொள்முதல் விலையை 3 தரநிலைகளில் பதிவிடலாம் மற்றும் முடிக்கப்பட்ட விற்பனை விலையைப் பதிவு செய்யலாம்.';
+    final lang = Localizations.localeOf(context).languageCode;
+    final village = lang == 'ta' ? profile.selectedVillageTa : profile.selectedVillage;
+    final district = lang == 'ta' ? profile.selectedDistrictTa : profile.selectedDistrict;
+    final userName = profile.fullName.isNotEmpty ? profile.fullName : context.tr('farmer_default');
 
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
@@ -51,7 +52,7 @@ class TraderDashboard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        '${profile.fullName} (கொள்முதல் வியாபாரி)',
+                        '$userName (${context.tr('trader_badge')})',
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -60,13 +61,15 @@ class TraderDashboard extends StatelessWidget {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        'மண்டி: ${profile.selectedVillageTa}, ${profile.selectedDistrictTa}',
+                        '${context.tr('mandi_label')}: $village, $district ${context.tr('district_suffix')}',
                         style: const TextStyle(fontSize: 13, color: AppColors.textSecondary),
                       ),
                     ],
                   ),
                 ),
-                const VoiceSpeakerButton(textToSpeak: voiceText),
+                VoiceSpeakerButton(
+                  textToSpeak: context.tr('trader_voice_welcome'),
+                ),
               ],
             ),
           ),
@@ -82,24 +85,26 @@ class TraderDashboard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Row(
+                  Row(
                     children: [
-                      Icon(Icons.rate_review_outlined, color: Colors.white, size: 26),
-                      SizedBox(width: 10),
-                      Text(
-                        'இன்றைய பயிர் விலை பதிவிட',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                      const Icon(Icons.rate_review_outlined, color: Colors.white, size: 26),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          context.tr('upload_price_callout_title'),
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 8),
-                  const Text(
-                    'முதல் தரம், இரண்டாம் தரம் மற்றும் மூன்றாம் தரத்திற்கான கொள்முதல் விலையை விவசாயிகளுக்கு தெரிவிக்கவும்.',
-                    style: TextStyle(fontSize: 14, color: Colors.white70, height: 1.3),
+                  Text(
+                    context.tr('upload_price_callout_desc'),
+                    style: const TextStyle(fontSize: 14, color: Colors.white70, height: 1.3),
                   ),
                   const SizedBox(height: 14),
                   ElevatedButton(
@@ -115,9 +120,9 @@ class TraderDashboard extends StatelessWidget {
                         MaterialPageRoute(builder: (_) => const UploadCropPriceScreen()),
                       );
                     },
-                    child: const Text(
-                      'விலைப்பட்டியல் சேர்க்க',
-                      style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                    child: Text(
+                      context.tr('upload_price_now_btn'),
+                      style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                     ),
                   ),
                 ],
@@ -126,7 +131,7 @@ class TraderDashboard extends StatelessWidget {
           ),
           const SizedBox(height: 16),
 
-          // Mandatory Separation Callout: Record Actual Transaction
+          // Record Actual Transaction Callout
           Container(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
@@ -138,21 +143,21 @@ class TraderDashboard extends StatelessWidget {
               children: [
                 const Icon(Icons.verified_outlined, color: Color(0xFF16A34A), size: 28),
                 const SizedBox(width: 12),
-                const Expanded(
+                Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'முடிக்கப்பட்ட விற்பனை பதிவு',
-                        style: TextStyle(
+                        context.tr('record_sale_callout_title'),
+                        style: const TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.bold,
                           color: Color(0xFF14532D),
                         ),
                       ),
                       Text(
-                        'உண்மையான விற்பனை விலையை தனிப் பதிவேட்டில் சேர்க்க',
-                        style: TextStyle(fontSize: 12, color: Color(0xFF166534)),
+                        context.tr('record_sale_callout_desc'),
+                        style: const TextStyle(fontSize: 12, color: Color(0xFF166534)),
                       ),
                     ],
                   ),
@@ -164,7 +169,10 @@ class TraderDashboard extends StatelessWidget {
                       MaterialPageRoute(builder: (_) => const RecordTransactionScreen()),
                     );
                   },
-                  child: const Text('பதிவு செய்', style: TextStyle(fontWeight: FontWeight.bold)),
+                  child: Text(
+                    context.tr('record_btn'),
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
                 ),
               ],
             ),
@@ -189,8 +197,8 @@ class TraderDashboard extends StatelessWidget {
             physics: const NeverScrollableScrollPhysics(),
             children: [
               StatCard(
-                title: 'சந்தை விலை விவரம்',
-                subtitle: '${cropProv.traderOffers.length} விலை அறிவிப்புகள்',
+                title: context.tr('my_price_posts'),
+                subtitle: '${cropProv.traderOffers.length} ${context.tr('posts_count')}',
                 icon: Icons.price_change_outlined,
                 color: const Color(0xFFD97706),
                 onTap: () {
@@ -201,8 +209,8 @@ class TraderDashboard extends StatelessWidget {
                 },
               ),
               StatCard(
-                title: 'உண்மையான விற்பனை',
-                subtitle: '${cropProv.actualTransactions.length} பதிவுகள்',
+                title: context.tr('verified_transactions'),
+                subtitle: '${cropProv.actualTransactions.length} ${context.tr('transactions_count')}',
                 icon: Icons.receipt_long_outlined,
                 color: const Color(0xFF059669),
                 onTap: () {
@@ -213,9 +221,9 @@ class TraderDashboard extends StatelessWidget {
                 },
               ),
               StatCard(
-                title: 'மண்டி அறிவிப்புகள்',
-                subtitle: 'ஒழுங்குமுறை கூடம்',
-                icon: Icons.campaign_outlined,
+                title: context.tr('crop_market_prices'),
+                subtitle: context.tr('market_prices_sub'),
+                icon: Icons.storefront,
                 color: const Color(0xFF2563EB),
                 onTap: () {
                   Navigator.push(
@@ -225,8 +233,8 @@ class TraderDashboard extends StatelessWidget {
                 },
               ),
               StatCard(
-                title: 'பயிர்களின் வரலாறு',
-                subtitle: 'கடந்த மாத விலைகள்',
+                title: context.tr('crop_history'),
+                subtitle: context.tr('past_month_prices'),
                 icon: Icons.timeline_outlined,
                 color: const Color(0xFF7C3AED),
                 onTap: () {

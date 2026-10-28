@@ -18,7 +18,7 @@ class JobDetailScreen extends StatefulWidget {
 }
 
 class _JobDetailScreenState extends State<JobDetailScreen> {
-  bool _shareContactConsent = true; // Explicit consent toggle
+  bool _shareContactConsent = true;
   bool _isApplying = false;
 
   void _handleApply(JobProvider jobProv) async {
@@ -38,17 +38,17 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
         context: context,
         builder: (ctx) => AlertDialog(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          title: const Row(
+          title: Row(
             children: [
-              Icon(Icons.check_circle, color: AppColors.primaryGreen, size: 28),
-              SizedBox(width: 10),
-              Text('விண்ணப்பம் பதிவானது'),
+              const Icon(Icons.check_circle, color: AppColors.primaryGreen, size: 28),
+              const SizedBox(width: 10),
+              Text(context.tr('app_submitted_title')),
             ],
           ),
           content: Text(
             _shareContactConsent
-                ? 'உங்கள் விண்ணப்பம் மற்றும் தொலைபேசி எண் வேலை தரும் முதலாளிக்கு வெற்றிகரமாக அனுப்பப்பட்டது.'
-                : 'உங்கள் விண்ணப்பம் சமர்ப்பிக்கப்பட்டது. உங்கள் தனியுரிமை விருப்பப்படி தொலைபேசி எண் பகிரப்படவில்லை.',
+                ? context.tr('app_submitted_with_phone')
+                : context.tr('app_submitted_no_phone'),
             style: const TextStyle(fontSize: 15, height: 1.3),
           ),
           actions: [
@@ -57,7 +57,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                 Navigator.pop(ctx);
                 Navigator.pop(context);
               },
-              child: const Text('சரி (OK)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              child: Text(context.tr('ok_btn'), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
             ),
           ],
         ),
@@ -69,13 +69,17 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
   Widget build(BuildContext context) {
     final jobProv = Provider.of<JobProvider>(context);
     final hasApplied = jobProv.hasApplied(widget.job.id);
+    final lang = Localizations.localeOf(context).languageCode;
+    final title = lang == 'ta' ? widget.job.titleTa : widget.job.titleEn;
+    final secondaryTitle = lang == 'ta' ? widget.job.titleEn : widget.job.titleTa;
+
     final voiceText =
-        '${widget.job.titleTa}. ஊர்: ${widget.job.village}. கூலி: நாள் ஒன்றுக்கு ரூபாய் ${widget.job.wageAmount.toStringAsFixed(0)}. பணி நேரம்: ${widget.job.workingHours}.';
+        '$title. ${widget.job.village}. ${context.tr('wage_header')}: ₹${widget.job.wageAmount.toStringAsFixed(0)}. ${context.tr('working_hours_header')}: ${widget.job.workingHours}.';
 
     return Scaffold(
       backgroundColor: AppColors.backgroundWhite,
       appBar: AppBar(
-        title: const Text('வேலை விவரம்'),
+        title: Text(context.tr('job_detail_title')),
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 16.0),
@@ -89,7 +93,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Badge & Title
+              // Badge & Status
               Row(
                 children: [
                   Container(
@@ -99,7 +103,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
-                      widget.job.workType == 'harvesting' ? 'அறுவடை பணி' : 'வேளாண் பணி',
+                      widget.job.workType == 'harvesting' ? context.tr('harvesting') : context.tr('all_jobs'),
                       style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
@@ -109,7 +113,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                   ),
                   const Spacer(),
                   Text(
-                    widget.job.isOpen ? 'திறந்துள்ளது' : 'நிறைவடைந்தது',
+                    widget.job.isOpen ? context.tr('job_status_open') : context.tr('job_status_closed'),
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.bold,
@@ -120,7 +124,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
               ),
               const SizedBox(height: 12),
               Text(
-                widget.job.titleTa,
+                title,
                 style: const TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
@@ -130,7 +134,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
               ),
               const SizedBox(height: 4),
               Text(
-                widget.job.titleEn,
+                secondaryTitle,
                 style: const TextStyle(fontSize: 14, color: AppColors.textMuted),
               ),
               const SizedBox(height: 20),
@@ -148,7 +152,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                   children: [
                     Column(
                       children: [
-                        const Text('தினக்கூலி', style: TextStyle(fontSize: 13, color: AppColors.textMuted)),
+                        Text(context.tr('wage_header'), style: const TextStyle(fontSize: 13, color: AppColors.textMuted)),
                         const SizedBox(height: 4),
                         Row(
                           children: [
@@ -168,7 +172,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                     Container(height: 36, width: 1, color: AppColors.borderSubtle),
                     Column(
                       children: [
-                        const Text('பணி நேரம்', style: TextStyle(fontSize: 13, color: AppColors.textMuted)),
+                        Text(context.tr('working_hours_header'), style: const TextStyle(fontSize: 13, color: AppColors.textMuted)),
                         const SizedBox(height: 4),
                         Text(
                           widget.job.workingHours,
@@ -186,13 +190,13 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
               const SizedBox(height: 20),
 
               // Detail List
-              _buildDetailRow(Icons.location_on_outlined, 'இடம்', '${widget.job.village}, ${widget.job.taluk} வட்டம், ${widget.job.district}'),
-              _buildDetailRow(Icons.calendar_month_outlined, 'வேலை நாள்', '${widget.job.workDate.day}/${widget.job.workDate.month}/${widget.job.workDate.year}'),
-              _buildDetailRow(Icons.group_outlined, 'தேவைப்படும் ஆட்கள்', '${widget.job.workersRequired} நபர்கள் (சேர்க்கப்பட்டவர்கள்: ${widget.job.workersHired})'),
+              _buildDetailRow(Icons.location_on_outlined, context.tr('job_location_header'), '${widget.job.village}, ${widget.job.taluk} ${context.tr('taluk_suffix')}, ${widget.job.district}'),
+              _buildDetailRow(Icons.calendar_month_outlined, context.tr('job_date_header'), '${widget.job.workDate.day}/${widget.job.workDate.month}/${widget.job.workDate.year}'),
+              _buildDetailRow(Icons.group_outlined, context.tr('job_workers_needed'), '${widget.job.workersRequired} ${context.tr('persons_unit')} (${context.tr('hired_label')}: ${widget.job.workersHired})'),
 
               if (widget.job.description.isNotEmpty) ...[
                 const SizedBox(height: 12),
-                const Text('கூடுதல் விவரம்:', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+                Text(context.tr('additional_details_header'), style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 6),
                 Container(
                   padding: const EdgeInsets.all(14),
@@ -209,7 +213,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
 
               const SizedBox(height: 24),
 
-              // Privacy & Contact Consent Box (Mandatory Requirement 27)
+              // Privacy & Contact Consent Box
               if (!hasApplied) ...[
                 Container(
                   padding: const EdgeInsets.all(14),
@@ -221,13 +225,13 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Row(
+                      Row(
                         children: [
-                          Icon(Icons.privacy_tip_outlined, color: AppColors.primaryGreen, size: 20),
-                          SizedBox(width: 8),
+                          const Icon(Icons.privacy_tip_outlined, color: AppColors.primaryGreen, size: 20),
+                          const SizedBox(width: 8),
                           Text(
-                            'தனியுரிமை மற்றும் தொடர்பு ஒப்புதல்',
-                            style: TextStyle(
+                            context.tr('privacy_consent_header'),
+                            style: const TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.bold,
                               color: AppColors.primaryGreenDark,
@@ -244,9 +248,9 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                         onChanged: (val) {
                           setState(() => _shareContactConsent = val ?? false);
                         },
-                        title: const Text(
-                          'வேலை அளிக்கும் முதலாளி என்னை நேரடியாகத் தொடர்புகொள்ள என் மொபைல் எண்ணைப் பகிர ஒப்புக்கொள்கிறேன்.',
-                          style: TextStyle(fontSize: 13, color: AppColors.textPrimary, height: 1.3),
+                        title: Text(
+                          context.tr('privacy_consent_checkbox'),
+                          style: const TextStyle(fontSize: 13, color: AppColors.textPrimary, height: 1.3),
                         ),
                       ),
                     ],
@@ -263,14 +267,14 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                     color: const Color(0xFFE0F2FE),
                     borderRadius: BorderRadius.circular(14),
                   ),
-                  child: const Row(
+                  child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.check_circle, color: Color(0xFF0284C7)),
-                      SizedBox(width: 8),
+                      const Icon(Icons.check_circle, color: Color(0xFF0284C7)),
+                      const SizedBox(width: 8),
                       Text(
-                        'நீங்கள் இந்த வேலைக்கு ஏற்கனவே விண்ணப்பித்துள்ளீர்கள்',
-                        style: TextStyle(
+                        context.tr('already_applied_label'),
+                        style: const TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
                           color: Color(0xFF0369A1),

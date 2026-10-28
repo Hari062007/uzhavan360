@@ -10,10 +10,7 @@ import '../../common/voice_speaker_button.dart';
 import '../jobs/job_listings_screen.dart';
 import '../jobs/my_applications_screen.dart';
 import '../market/crop_prices_screen.dart';
-import '../schemes/schemes_screen.dart';
-import '../panchayat/announcements_screen.dart';
 import '../weather/weather_screen.dart';
-import '../adviser/adviser_screen.dart';
 
 class WorkerDashboard extends StatelessWidget {
   const WorkerDashboard({super.key});
@@ -24,9 +21,10 @@ class WorkerDashboard extends StatelessWidget {
     final job = Provider.of<JobProvider>(context);
     final weatherProv = Provider.of<WeatherProvider>(context);
     final weather = weatherProv.weather;
-
-    final voiceInstruction =
-        'வணக்கம் ${profile.fullName.isNotEmpty ? profile.fullName : ""}! உங்கள் ஊரில் உள்ள வேளாண் வேலைகள், சந்தை விலை மற்றும் அரசு திட்டங்களை இங்கே காணலாம்.';
+    final lang = Localizations.localeOf(context).languageCode;
+    final village = lang == 'ta' ? profile.selectedVillageTa : profile.selectedVillage;
+    final taluk = lang == 'ta' ? profile.selectedTalukTa : profile.selectedTaluk;
+    final userName = profile.fullName.isNotEmpty ? profile.fullName : context.tr('farmer_default');
 
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
@@ -58,7 +56,7 @@ class WorkerDashboard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        '${context.tr('dashboard_greeting')}${profile.fullName.isNotEmpty ? profile.fullName : "விவசாயி"}',
+                        '${context.tr('dashboard_greeting')}$userName',
                         style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -71,7 +69,7 @@ class WorkerDashboard extends StatelessWidget {
                           const Icon(Icons.location_on, size: 14, color: AppColors.textSecondary),
                           const SizedBox(width: 4),
                           Text(
-                            '${profile.selectedVillageTa}, ${profile.selectedTalukTa}',
+                            '$village, $taluk',
                             style: const TextStyle(fontSize: 13, color: AppColors.textSecondary),
                           ),
                         ],
@@ -79,7 +77,9 @@ class WorkerDashboard extends StatelessWidget {
                     ],
                   ),
                 ),
-                VoiceSpeakerButton(textToSpeak: voiceInstruction),
+                VoiceSpeakerButton(
+                  textToSpeak: context.tr('worker_voice_welcome'),
+                ),
               ],
             ),
           ),
@@ -109,7 +109,7 @@ class WorkerDashboard extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              '${weather.temperature.toStringAsFixed(1)}°C - ${weather.conditionTa}',
+                              '${weather.temperature.toStringAsFixed(1)}°C - ${lang == 'ta' ? weather.conditionTa : weather.conditionEn}',
                               style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -118,7 +118,7 @@ class WorkerDashboard extends StatelessWidget {
                             ),
                             const SizedBox(height: 2),
                             Text(
-                              'மழை வாய்ப்பு: ${weather.rainProbability}% | ஈரப்பதம்: ${weather.humidity}%',
+                              '${context.tr('rain_chance')}: ${weather.rainProbability}% | ${context.tr('humidity')}: ${weather.humidity}%',
                               style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
                             ),
                           ],
@@ -133,7 +133,6 @@ class WorkerDashboard extends StatelessWidget {
 
           const SizedBox(height: 16),
 
-          // Section Title
           Text(
             context.tr('quick_services'),
             style: const TextStyle(
@@ -144,7 +143,7 @@ class WorkerDashboard extends StatelessWidget {
           ),
           const SizedBox(height: 12),
 
-          // Main Service Grid
+          // 4 Focused Service Cards for Worker
           GridView.count(
             crossAxisCount: 2,
             crossAxisSpacing: 12,
@@ -154,9 +153,9 @@ class WorkerDashboard extends StatelessWidget {
             children: [
               StatCard(
                 title: context.tr('find_jobs'),
-                subtitle: '${job.jobs.length} வேலைகள் தயார்',
+                subtitle: '${job.jobs.length} ${context.tr('jobs_ready')}',
                 icon: Icons.work_outline,
-                badgeText: 'புதியது',
+                badgeText: context.tr('badge_new'),
                 color: AppColors.primaryGreen,
                 onTap: () {
                   Navigator.push(
@@ -167,7 +166,7 @@ class WorkerDashboard extends StatelessWidget {
               ),
               StatCard(
                 title: context.tr('crop_market_prices'),
-                subtitle: 'மண்டி தினசரி விலை',
+                subtitle: context.tr('mandi_daily_price'),
                 icon: Icons.storefront,
                 color: const Color(0xFFD97706),
                 onTap: () {
@@ -178,20 +177,8 @@ class WorkerDashboard extends StatelessWidget {
                 },
               ),
               StatCard(
-                title: context.tr('government_schemes_title'),
-                subtitle: 'மானியங்கள் & உதவிகள்',
-                icon: Icons.account_balance,
-                color: const Color(0xFF2563EB),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const SchemesScreen()),
-                  );
-                },
-              ),
-              StatCard(
                 title: context.tr('my_applications'),
-                subtitle: '${job.myApplications.length} விண்ணப்பங்கள்',
+                subtitle: '${job.myApplications.length} ${context.tr('my_applications_count')}',
                 icon: Icons.assignment_turned_in_outlined,
                 color: const Color(0xFF059669),
                 onTap: () {
@@ -202,26 +189,14 @@ class WorkerDashboard extends StatelessWidget {
                 },
               ),
               StatCard(
-                title: context.tr('village_announcements_title'),
-                subtitle: 'பஞ்சாயத்து செய்திகள்',
-                icon: Icons.campaign_outlined,
-                color: const Color(0xFFDC2626),
+                title: context.tr('weather_title'),
+                subtitle: context.tr('weather_summary'),
+                icon: Icons.cloud_outlined,
+                color: const Color(0xFF2563EB),
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (_) => const AnnouncementsScreen()),
-                  );
-                },
-              ),
-              StatCard(
-                title: context.tr('farmer_adviser_title'),
-                subtitle: 'முன்னோடி உழவர் உதவி',
-                icon: Icons.people_outline,
-                color: const Color(0xFF7C3AED),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const AdviserScreen()),
+                    MaterialPageRoute(builder: (_) => const WeatherScreen()),
                   );
                 },
               ),

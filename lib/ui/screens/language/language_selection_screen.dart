@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/localization/app_localizations.dart';
 import '../../../core/services/storage_service.dart';
 import '../../../state/locale_provider.dart';
 import '../../common/uzhavan_button.dart';
@@ -15,7 +16,7 @@ class LanguageSelectionScreen extends StatefulWidget {
 }
 
 class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
-  String _selectedLang = 'ta'; // Tamil default
+  String _selectedLang = 'ta';
 
   @override
   void initState() {
@@ -37,16 +38,16 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
 
   @override
   Widget build(BuildContext context) {
-    const voiceText = 'வணக்கம்! நீங்கள் பயன்பாட்டை உபயோகிக்க விரும்பும் மொழியைத் தேர்ந்தெடுக்கவும்.';
-
     return Scaffold(
       backgroundColor: AppColors.backgroundWhite,
       appBar: AppBar(
         title: const Text('UZHAVAN360'),
-        actions: const [
+        actions: [
           Padding(
-            padding: EdgeInsets.only(right: 16.0),
-            child: VoiceSpeakerButton(textToSpeak: voiceText),
+            padding: const EdgeInsets.only(right: 16.0),
+            child: VoiceSpeakerButton(
+              textToSpeak: context.tr('voice_lang_instruction'),
+            ),
           ),
         ],
       ),
@@ -56,8 +57,7 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const SizedBox(height: 16),
-              // Logo snippet
+              const SizedBox(height: 12),
               Center(
                 child: Container(
                   width: 90,
@@ -66,7 +66,7 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        color: AppColors.primaryGreen.withValues(alpha: 0.1),
+                        color: AppColors.primaryGreen.withValues(alpha: 0.08),
                         blurRadius: 10,
                         offset: const Offset(0, 4),
                       ),
@@ -82,50 +82,49 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
                 ),
               ),
               const SizedBox(height: 24),
-              const Text(
-                'மொழியைத் தேர்ந்தெடுக்கவும்',
+              Text(
+                context.tr('select_language'),
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
                   color: AppColors.textPrimary,
                 ),
               ),
               const SizedBox(height: 6),
-              const Text(
-                'Choose your preferred language',
+              Text(
+                context.tr('choose_language_sub'),
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 16,
+                style: const TextStyle(
+                  fontSize: 15,
                   color: AppColors.textMuted,
                 ),
               ),
-              const SizedBox(height: 36),
+              const SizedBox(height: 32),
 
-              // Tamil option (Default)
+              // Tamil Card (Default)
               _buildLanguageCard(
                 code: 'ta',
                 title: 'தமிழ்',
-                sub: 'Tamil (முன்னுரிமை)',
+                sub: context.tr('tamil_sub'),
                 icon: Icons.language,
                 isSelected: _selectedLang == 'ta',
               ),
               const SizedBox(height: 16),
 
-              // English option
+              // English Card
               _buildLanguageCard(
                 code: 'en',
                 title: 'English',
-                sub: 'ஆங்கிலம்',
+                sub: context.tr('english_sub'),
                 icon: Icons.translate,
                 isSelected: _selectedLang == 'en',
               ),
 
               const Spacer(),
 
-              // Confirmation button
               UzhavanButton(
-                label: _selectedLang == 'ta' ? 'தொடரவும்' : 'Continue',
+                label: context.tr('continue_btn'),
                 icon: Icons.arrow_forward_rounded,
                 onPressed: _proceed,
               ),

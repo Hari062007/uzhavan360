@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uzhavan360/core/services/storage_service.dart';
 import 'package:uzhavan360/core/services/connectivity_service.dart';
+import 'package:uzhavan360/data/repositories/auth_repository.dart';
 import 'package:uzhavan360/state/auth_provider.dart';
 
 void main() {
@@ -11,6 +12,7 @@ void main() {
     SharedPreferences.setMockInitialValues({});
     await StorageService.init();
     ConnectivityService.mockInternetAvailable = true;
+    AuthRepository.mockAuthForTesting = true;
   });
 
   group('Authentication Unit Tests', () {
@@ -52,6 +54,16 @@ void main() {
       expect(result, isTrue);
       expect(StorageService.isAuthenticated(), isTrue);
       expect(StorageService.getPhoneNumber(), contains('9842100001'));
+    });
+
+    test('Unconfigured Supabase returns explicit configuration error in production mode', () async {
+      AuthRepository.mockAuthForTesting = false;
+      final authProvider = AuthProvider();
+      authProvider.setPhoneNumber('9842100001');
+      final result = await authProvider.requestOtp();
+
+      expect(result, isFalse);
+      expect(authProvider.errorMessage, equals('supabase_not_configured'));
     });
   });
 }

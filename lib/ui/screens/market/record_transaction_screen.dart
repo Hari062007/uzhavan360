@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/localization/app_localizations.dart';
 import '../../../core/services/storage_service.dart';
 import '../../../state/crop_price_provider.dart';
 import '../../common/uzhavan_button.dart';
@@ -28,7 +29,7 @@ class _RecordTransactionScreenState extends State<RecordTransactionScreen> {
   void initState() {
     super.initState();
     final village = StorageService.getVillage();
-    _marketController.text = '$village ஒழுங்குமுறை கூடம்';
+    _marketController.text = village;
   }
 
   @override
@@ -60,8 +61,8 @@ class _RecordTransactionScreenState extends State<RecordTransactionScreen> {
 
     if (success && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('உண்மையான விற்பனைப் பரிவர்த்தனை வெற்றிகரமாகப் பதிவு செய்யப்பட்டது!'),
+        SnackBar(
+          content: Text(context.tr('record_success')),
           backgroundColor: AppColors.primaryGreen,
         ),
       );
@@ -74,7 +75,7 @@ class _RecordTransactionScreenState extends State<RecordTransactionScreen> {
     return Scaffold(
       backgroundColor: AppColors.backgroundWhite,
       appBar: AppBar(
-        title: const Text('விற்பனைப் பரிவர்த்தனை பதிவு'),
+        title: Text(context.tr('record_transaction_title')),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -92,14 +93,14 @@ class _RecordTransactionScreenState extends State<RecordTransactionScreen> {
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(color: const Color(0xFF86EFAC)),
                   ),
-                  child: const Row(
+                  child: Row(
                     children: [
-                      Icon(Icons.shield_outlined, color: AppColors.primaryGreen, size: 22),
-                      SizedBox(width: 10),
+                      const Icon(Icons.shield_outlined, color: AppColors.primaryGreen, size: 22),
+                      const SizedBox(width: 10),
                       Expanded(
                         child: Text(
-                          'சந்தையில் நடைபெற்ற உண்மையான விற்பனை விலை விவரங்களை இங்கே பதிவு செய்யலாம்.',
-                          style: TextStyle(fontSize: 13, color: AppColors.primaryGreenDark, height: 1.3),
+                          context.tr('record_banner_text'),
+                          style: const TextStyle(fontSize: 13, color: AppColors.primaryGreenDark, height: 1.3),
                         ),
                       ),
                     ],
@@ -109,15 +110,15 @@ class _RecordTransactionScreenState extends State<RecordTransactionScreen> {
 
                 // Crop Name
                 UzhavanTextField(
-                  label: 'விளைபொருள் பெயர்',
-                  hint: 'எ.கா: பொன்னி நெல் / விரலி மஞ்சள்',
+                  label: context.tr('crop_name_label'),
+                  hint: context.tr('crop_record_hint'),
                   controller: _cropController,
-                  validator: (v) => v!.isEmpty ? 'பயிர் பெயர் தேவை' : null,
+                  validator: (v) => v!.isEmpty ? context.tr('crop_name_required') : null,
                 ),
                 const SizedBox(height: 16),
 
                 // Quality Grade
-                const Text('விற்பனை செய்யப்பட்ட தரம்', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                Text(context.tr('sold_grade_label'), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 8),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -130,10 +131,10 @@ class _RecordTransactionScreenState extends State<RecordTransactionScreen> {
                     child: DropdownButton<String>(
                       value: _qualityGrade,
                       isExpanded: true,
-                      items: const [
-                        DropdownMenuItem(value: 'grade_1', child: Text('முதல் தரம் (Grade 1 - Top Quality)')),
-                        DropdownMenuItem(value: 'grade_2', child: Text('இரண்டாம் தரம் (Grade 2 - Medium)')),
-                        DropdownMenuItem(value: 'grade_3', child: Text('மூன்றாம் தரம் (Grade 3 - Fair)')),
+                      items: [
+                        DropdownMenuItem(value: 'grade_1', child: Text(context.tr('grade_1_label'))),
+                        DropdownMenuItem(value: 'grade_2', child: Text(context.tr('grade_2_label'))),
+                        DropdownMenuItem(value: 'grade_3', child: Text(context.tr('grade_3_label'))),
                       ],
                       onChanged: (val) {
                         if (val != null) setState(() => _qualityGrade = val);
@@ -148,7 +149,7 @@ class _RecordTransactionScreenState extends State<RecordTransactionScreen> {
                   children: [
                     Expanded(
                       child: UzhavanTextField(
-                        label: 'விற்பனை விலை (₹)',
+                        label: context.tr('sale_price_label'),
                         hint: '2420',
                         controller: _priceController,
                         keyboardType: TextInputType.number,
@@ -157,7 +158,7 @@ class _RecordTransactionScreenState extends State<RecordTransactionScreen> {
                     const SizedBox(width: 14),
                     Expanded(
                       child: UzhavanTextField(
-                        label: 'அளவு (Quantity)',
+                        label: context.tr('quantity_label'),
                         hint: '40',
                         controller: _quantityController,
                         keyboardType: TextInputType.number,
@@ -169,14 +170,14 @@ class _RecordTransactionScreenState extends State<RecordTransactionScreen> {
 
                 // Market / Location
                 UzhavanTextField(
-                  label: 'விற்பனை நடைபெற்ற இடம் / மண்டி',
-                  hint: 'ஒழுங்குமுறை விற்பனைக்கூடம்',
+                  label: context.tr('sale_location_label'),
+                  hint: context.tr('market_location_hint'),
                   controller: _marketController,
                 ),
                 const SizedBox(height: 16),
 
                 // Source
-                const Text('விற்பனை வகை / ஆதாரம்', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                Text(context.tr('sale_source_label'), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 8),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -189,10 +190,10 @@ class _RecordTransactionScreenState extends State<RecordTransactionScreen> {
                     child: DropdownButton<String>(
                       value: _source,
                       isExpanded: true,
-                      items: const [
-                        DropdownMenuItem(value: 'regulated_market', child: Text('ஒழுங்குமுறை கூடம் (Regulated Market)')),
-                        DropdownMenuItem(value: 'trader_direct', child: Text('மண்டி / நேரடி கொள்முதல் (Trader Direct)')),
-                        DropdownMenuItem(value: 'farmer_sale', child: Text('உழவர் நேரடி விற்பனை (Farmer Direct)')),
+                      items: [
+                        DropdownMenuItem(value: 'regulated_market', child: Text(context.tr('source_regulated'))),
+                        DropdownMenuItem(value: 'trader_direct', child: Text(context.tr('source_trader'))),
+                        DropdownMenuItem(value: 'farmer_sale', child: Text(context.tr('source_farmer'))),
                       ],
                       onChanged: (val) {
                         if (val != null) setState(() => _source = val);
@@ -203,7 +204,7 @@ class _RecordTransactionScreenState extends State<RecordTransactionScreen> {
                 const SizedBox(height: 28),
 
                 UzhavanButton(
-                  label: 'விற்பனை விலையைப் பதிவு செய்',
+                  label: context.tr('record_submit_btn'),
                   icon: Icons.check,
                   isLoading: _isLoading,
                   onPressed: _handleSubmit,

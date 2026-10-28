@@ -18,12 +18,12 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _phoneController = TextEditingController();
 
-  final List<Map<String, String>> _countries = [
-    {'name': 'இந்தியா (India)', 'code': '+91'},
-    {'name': 'மலேசியா (Malaysia)', 'code': '+60'},
-    {'name': 'சிங்கப்பூர் (Singapore)', 'code': '+65'},
-    {'name': 'இலங்கை (Sri Lanka)', 'code': '+94'},
-    {'name': 'ஐக்கிய அரபு அமீரகம் (UAE)', 'code': '+971'},
+  final List<Map<String, String>> _countries = const [
+    {'key': 'country_india', 'code': '+91'},
+    {'key': 'country_malaysia', 'code': '+60'},
+    {'key': 'country_singapore', 'code': '+65'},
+    {'key': 'country_sri_lanka', 'code': '+94'},
+    {'key': 'country_uae', 'code': '+971'},
   ];
 
   @override
@@ -51,10 +51,12 @@ class _LoginScreenState extends State<LoginScreen> {
       backgroundColor: AppColors.backgroundWhite,
       appBar: AppBar(
         title: const Text('UZHAVAN360'),
-        actions: const [
+        actions: [
           Padding(
-            padding: EdgeInsets.only(right: 16.0),
-            child: VoiceSpeakerButton(textToSpeak: 'வணக்கம்! உங்கள் மொபைல் எண்ணை உள்ளிட்டு OTP பெறவும்.'),
+            padding: const EdgeInsets.only(right: 16.0),
+            child: VoiceSpeakerButton(
+              textToSpeak: context.tr('login_voice_instruction'),
+            ),
           ),
         ],
       ),
@@ -65,16 +67,16 @@ class _LoginScreenState extends State<LoginScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SizedBox(height: 12),
-              // Official Emblem with traditional farmer & modern agricultural drone
+              // Official Emblem
               Center(
                 child: Container(
-                  width: 140,
-                  height: 220,
+                  width: 130,
+                  height: 180,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(20),
                     boxShadow: [
                       BoxShadow(
-                        color: AppColors.primaryGreen.withValues(alpha: 0.12),
+                        color: AppColors.primaryGreen.withValues(alpha: 0.1),
                         blurRadius: 16,
                         offset: const Offset(0, 6),
                       ),
@@ -136,7 +138,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       return DropdownMenuItem<String>(
                         value: c['code'],
                         child: Text(
-                          '${c['name']} (${c['code']})',
+                          '${context.tr(c['key']!)} (${c['code']})',
                           style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                         ),
                       );
@@ -202,7 +204,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
               const SizedBox(height: 28),
 
-              // Large Green Get OTP Button
               UzhavanButton(
                 label: context.tr('get_otp_btn'),
                 icon: Icons.sms_outlined,

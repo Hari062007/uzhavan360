@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/localization/app_localizations.dart';
 import '../../../core/services/storage_service.dart';
 import '../../../state/job_provider.dart';
 import '../../common/uzhavan_button.dart';
@@ -21,7 +22,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
   final TextEditingController _wageController = TextEditingController(text: '650');
   final TextEditingController _workersController = TextEditingController(text: '6');
   final TextEditingController _hoursController = TextEditingController(text: '7:30 AM - 1:30 PM');
-  final TextEditingController _descController = TextEditingController(text: 'மதிய உணவு மற்றும் டீ வழங்கப்படும்.');
+  final TextEditingController _descController = TextEditingController();
   DateTime _selectedDate = DateTime.now().add(const Duration(days: 1));
   bool _isLoading = false;
 
@@ -60,8 +61,8 @@ class _PostJobScreenState extends State<PostJobScreen> {
 
     if (success && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('வேலை தேவை அறிவிப்பு வெற்றிகரமாக வெளியிடப்பட்டது!'),
+        SnackBar(
+          content: Text(context.tr('post_job_success')),
           backgroundColor: AppColors.primaryGreen,
         ),
       );
@@ -74,7 +75,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
     return Scaffold(
       backgroundColor: AppColors.backgroundWhite,
       appBar: AppBar(
-        title: const Text('வேலை தேவை பதிவிடுதல்'),
+        title: Text(context.tr('post_job_title')),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -85,7 +86,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 // Work Type Selection
-                const Text('பணி வகை', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                Text(context.tr('work_type_label'), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 8),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -98,11 +99,11 @@ class _PostJobScreenState extends State<PostJobScreen> {
                     child: DropdownButton<String>(
                       value: _workType,
                       isExpanded: true,
-                      items: const [
-                        DropdownMenuItem(value: 'harvesting', child: Text('அறுவடை பணி (Harvesting)')),
-                        DropdownMenuItem(value: 'weeding', child: Text('நடவு மற்றும் களையெடுத்தல் (Weeding)')),
-                        DropdownMenuItem(value: 'plowing', child: Text('உழவு பணி (Plowing)')),
-                        DropdownMenuItem(value: 'machinery', child: Text('இயந்திரம் / மரம் ஏறுதல் (Machinery)')),
+                      items: [
+                        DropdownMenuItem(value: 'harvesting', child: Text(context.tr('harvesting_opt'))),
+                        DropdownMenuItem(value: 'weeding', child: Text(context.tr('weeding_opt'))),
+                        DropdownMenuItem(value: 'plowing', child: Text(context.tr('plowing_opt'))),
+                        DropdownMenuItem(value: 'machinery', child: Text(context.tr('machinery_opt'))),
                       ],
                       onChanged: (val) {
                         if (val != null) setState(() => _workType = val);
@@ -114,15 +115,21 @@ class _PostJobScreenState extends State<PostJobScreen> {
 
                 // Title
                 UzhavanTextField(
-                  label: 'வேலை தலைப்பு (தமிழ்)',
-                  hint: 'எ.கா: கரும்பு வெட்டும் பணி',
+                  label: context.tr('job_title_ta_label'),
+                  hint: context.tr('job_title_ta_hint'),
                   controller: _titleTaController,
-                  validator: (v) => v!.isEmpty ? 'தலைப்பு தேவை' : null,
+                  validator: (v) => v!.isEmpty ? context.tr('job_title_required') : null,
+                ),
+                const SizedBox(height: 16),
+                UzhavanTextField(
+                  label: context.tr('job_title_en_label'),
+                  hint: 'e.g. Paddy Harvesting',
+                  controller: _titleEnController,
                 ),
                 const SizedBox(height: 18),
 
                 // Date Picker
-                const Text('வேலை நாள்', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                Text(context.tr('work_date_label'), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 8),
                 InkWell(
                   onTap: () async {
@@ -160,7 +167,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
                   children: [
                     Expanded(
                       child: UzhavanTextField(
-                        label: 'தினக்கூலி (₹)',
+                        label: context.tr('daily_wage_label'),
                         hint: '650',
                         controller: _wageController,
                         keyboardType: TextInputType.number,
@@ -169,7 +176,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
                     const SizedBox(width: 14),
                     Expanded(
                       child: UzhavanTextField(
-                        label: 'ஆட்கள் எண்ணிக்கை',
+                        label: context.tr('workers_count_label'),
                         hint: '6',
                         controller: _workersController,
                         keyboardType: TextInputType.number,
@@ -181,7 +188,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
 
                 // Working Hours
                 UzhavanTextField(
-                  label: 'பணி நேரம்',
+                  label: context.tr('working_hours_label'),
                   hint: '7:30 AM - 1:30 PM',
                   controller: _hoursController,
                 ),
@@ -189,15 +196,15 @@ class _PostJobScreenState extends State<PostJobScreen> {
 
                 // Additional description
                 UzhavanTextField(
-                  label: 'கூடுதல் குறிப்பு (மதிய உணவு, வசதிகள் போன்றவை)',
-                  hint: 'குறிப்பு உள்ளிடவும்',
+                  label: context.tr('additional_notes_label'),
+                  hint: context.tr('enter_notes_hint'),
                   controller: _descController,
                   maxLines: 2,
                 ),
                 const SizedBox(height: 28),
 
                 UzhavanButton(
-                  label: 'வேலை தேவையை வெளியிடு',
+                  label: context.tr('publish_job_btn'),
                   icon: Icons.check,
                   isLoading: _isLoading,
                   onPressed: _handleSubmit,

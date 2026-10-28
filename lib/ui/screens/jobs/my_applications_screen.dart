@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/localization/app_localizations.dart';
 import '../../../state/job_provider.dart';
 import '../../common/empty_state_view.dart';
 import '../../common/voice_speaker_button.dart';
@@ -13,24 +14,21 @@ class MyApplicationsScreen extends StatelessWidget {
     final jobProv = Provider.of<JobProvider>(context);
     final apps = jobProv.myApplications;
 
-    const voiceText =
-        'நீங்கள் இதுவரை விண்ணப்பித்த விவசாய வேலைகளின் விபரம் மற்றும் முதலாளியின் பதில் நிலவரம் இங்கே உள்ளது.';
-
     return Scaffold(
       backgroundColor: AppColors.backgroundWhite,
       appBar: AppBar(
-        title: const Text('என் விண்ணப்பங்கள்'),
-        actions: const [
+        title: Text(context.tr('my_apps_title')),
+        actions: [
           Padding(
-            padding: EdgeInsets.only(right: 16.0),
-            child: VoiceSpeakerButton(textToSpeak: voiceText),
+            padding: const EdgeInsets.only(right: 16.0),
+            child: VoiceSpeakerButton(textToSpeak: context.tr('my_apps_voice')),
           ),
         ],
       ),
       body: apps.isEmpty
-          ? const EmptyStateView(
-              title: 'விண்ணப்பங்கள் எதுவும் இல்லை',
-              subtitle: 'நீங்கள் ஏதேனும் வேலைக்கு விண்ணப்பித்தால் அதன் நிலை இங்கே தெரியும்.',
+          ? EmptyStateView(
+              title: context.tr('no_apps_title'),
+              subtitle: context.tr('no_apps_sub'),
               icon: Icons.assignment_outlined,
             )
           : ListView.builder(
@@ -60,7 +58,7 @@ class MyApplicationsScreen extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Text(
-                                'விண்ணப்ப எண்: ${app.id.substring(app.id.length - 6)}',
+                                '${context.tr('app_id_prefix')}${app.id.substring(app.id.length - 6)}',
                                 style: const TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.bold,
@@ -78,8 +76,8 @@ class MyApplicationsScreen extends StatelessWidget {
                               ),
                               child: Text(
                                 app.status == 'accepted'
-                                    ? 'ஏற்றுக்கொள்ளப்பட்டது'
-                                    : 'பரிசீலனையில் உள்ளது',
+                                    ? context.tr('status_accepted')
+                                    : context.tr('status_pending'),
                                 style: TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.bold,
@@ -92,9 +90,9 @@ class MyApplicationsScreen extends StatelessWidget {
                           ],
                         ),
                         const SizedBox(height: 12),
-                        const Text(
-                          'வேளாண் அறுவடை / பண்ணை வேலை',
-                          style: TextStyle(
+                        Text(
+                          context.tr('farm_work_default'),
+                          style: const TextStyle(
                             fontSize: 17,
                             fontWeight: FontWeight.bold,
                             color: AppColors.textPrimary,
@@ -111,8 +109,8 @@ class MyApplicationsScreen extends StatelessWidget {
                             const SizedBox(width: 6),
                             Text(
                               app.shareContactConsent
-                                  ? 'தொலைபேசி எண் முதலாளியுடன் பகிரப்பட்டுள்ளது'
-                                  : 'தொலைபேசி எண் பகிரப்படவில்லை (பாதுகாப்பானது)',
+                                  ? context.tr('phone_shared_note')
+                                  : context.tr('phone_not_shared_note'),
                               style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
                             ),
                           ],

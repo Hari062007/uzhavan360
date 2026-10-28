@@ -39,7 +39,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
   }
 
   Future<void> _checkNextScreen() async {
-    await Future.delayed(const Duration(milliseconds: 2200));
+    await Future.delayed(const Duration(milliseconds: 2000));
     if (!mounted) return;
 
     final isAuth = StorageService.isAuthenticated();
@@ -73,75 +73,79 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.backgroundWhite,
-      body: Center(
-        child: FadeTransition(
-          opacity: _fadeAnimation,
-          child: ScaleTransition(
-            scale: _scaleAnimation,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // Preserved official UZHAVAN360 Logo Emblem
-                Container(
-                  width: 220,
-                  height: 380,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(24),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.primaryGreen.withValues(alpha: 0.12),
-                        blurRadius: 20,
-                        offset: const Offset(0, 8),
-                      ),
-                    ],
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(24),
-                    child: Image.asset(
-                      'assets/images/uzhavan360_logo.jpg',
-                      fit: BoxFit.contain,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
-                          color: AppColors.greenLightBg,
-                          child: const Icon(
-                            Icons.agriculture,
-                            size: 100,
-                            color: AppColors.primaryGreen,
+      body: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            child: FadeTransition(
+              opacity: _fadeAnimation,
+              child: ScaleTransition(
+                scale: _scaleAnimation,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // Preserved official UZHAVAN360 Logo Emblem
+                    Container(
+                      width: 170,
+                      height: 250,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(24),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.primaryGreen.withValues(alpha: 0.12),
+                            blurRadius: 20,
+                            offset: const Offset(0, 8),
                           ),
-                        );
-                      },
+                        ],
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(24),
+                        child: Image.asset(
+                          'assets/images/uzhavan360_logo.jpg',
+                          fit: BoxFit.contain,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Container(
+                              color: AppColors.greenLightBg,
+                              child: const Icon(
+                                Icons.agriculture,
+                                size: 80,
+                                color: AppColors.primaryGreen,
+                              ),
+                            );
+                          },
+                        ),
+                      ),
                     ),
-                  ),
+                    const SizedBox(height: 28),
+                    const Text(
+                      'UZHAVAN360',
+                      style: TextStyle(
+                        fontSize: 26,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 1.5,
+                        color: AppColors.primaryGreenDark,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    const Text(
+                      'உழவன் 360',
+                      style: TextStyle(
+                        fontSize: 19,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.primaryGreenLight,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    const SizedBox(
+                      width: 32,
+                      height: 32,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 3,
+                        color: AppColors.primaryGreen,
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 32),
-                const Text(
-                  'UZHAVAN360',
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: 1.5,
-                    color: AppColors.primaryGreenDark,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                const Text(
-                  'உழவன் 360',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.primaryGreenLight,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                const SizedBox(
-                  width: 36,
-                  height: 36,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 3,
-                    color: AppColors.primaryGreen,
-                  ),
-                ),
-              ],
+              ),
             ),
           ),
         ),
